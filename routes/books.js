@@ -12,8 +12,6 @@ const router = express.Router();
 
 // YOUR CODE HERE
 
-// router.use(parser.text());
-
 router.get('/books',(req,res,next)=>{
   knex('books')
     .select('id','genre','title','author','description','cover_url as coverUrl','created_at as createdAt','updated_at as updatedAt').orderBy('title')
@@ -53,11 +51,9 @@ router.delete('/books/:id',(req,res,next)=>{
     .where('id','=',req.params.id)
     .del()
     .then(result=>{
-      // console.log(result);
       delete result[0].id
       delete result[0].created_at
       delete result[0].updated_at
-      // result = humps.camelize(result[0])
       res.send(humps.camelizeKeys(result[0]))
     })
 })

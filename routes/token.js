@@ -23,7 +23,7 @@ router.get('/token', (req, res, next) => {
 router.post('/token', (req, res, next) => {
   if (!req.body) {
     res.send(false)
-  } else {
+  }
     knex('users')
       .select('id', 'email', 'first_name as firstName', 'last_name as lastName', 'hashed_password as hash')
       .where('email', req.body.email)
@@ -48,7 +48,7 @@ router.post('/token', (req, res, next) => {
           res.send('Bad email or password')
         })
       })
-  }
+  
 })
 
 router.delete('/token', (req, res, next) => {
