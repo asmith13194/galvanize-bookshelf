@@ -12,7 +12,7 @@ const knex = require('../knex');
 
 router.get('/token', (req, res, next) => {
   var token = req.cookies.token
-  jwt.verify(token, 'secret', (err, decoded) => {
+  jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
     if (err) {
       return res.send(false)
     }
@@ -37,7 +37,7 @@ router.post('/token', (req, res, next) => {
         bcrypt.compare(req.body.password, userInfo.hash, (err, response) => {
           if (response) {
             delete userInfo.hash;
-            var token = jwt.sign(userInfo, 'secret');
+            var token = jwt.sign(userInfo, process.env.JWT_KEY);
             res.cookie('token', token, {
               httpOnly: true
             });
@@ -48,19 +48,12 @@ router.post('/token', (req, res, next) => {
           res.send('Bad email or password')
         })
       })
-  
+
 })
 
 router.delete('/token', (req, res, next) => {
-  // var token = req.cookies.token
-  //
-  // jwt.verify(token, 'secret',(err, decoded)=>{
-  //   if(err){
-  //     return res.send(false)
-  //   }
   res.cookie('token', '')
   res.send(true)
-  // });
 })
 
 module.exports = router;

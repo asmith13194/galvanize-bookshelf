@@ -14,7 +14,7 @@ const humps = require('humps');
 router.use('/favorites',(req,res,next)=>{
   if(req.cookies.token){
     let token = req.cookies.token
-    jwt.verify(token,'secret',(err,decode)=>{
+    jwt.verify(token,process.env.JWT_KEY,(err,decode)=>{
       if(err){
         res.clearCookie('token');
         return next(err)
