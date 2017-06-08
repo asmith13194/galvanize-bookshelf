@@ -13,6 +13,6 @@ module.exports = {
 
   production: {
     client: 'pg',
-    connection: 'postgres://gsijtajtbetezb:bfcd5b2f7f6e5152e8a05b04ecb414af6ab9d6f7e60c1b6be9d0391c5b3959cf@ec2-50-19-219-69.compute-1.amazonaws.com:5432/d6m76shcploh3j'
+    connection: process.env.DATABASE_URL
   }
 };
