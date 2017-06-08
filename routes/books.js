@@ -21,7 +21,7 @@ router.get('/books', (req, res, next) => {
 })
 
 router.get('/books/:id', (req, res, next) => {
-  if (parseInt(req.params.id)*0 !== 0) {
+  if (parseInt(req.params.id) * 0 !== 0) {
     return res.sendStatus(404)
   }
   knex('books')
@@ -40,7 +40,6 @@ router.get('/books/:id', (req, res, next) => {
 })
 
 router.post('/books', (req, res, next) => {
-  // console.log(req.body);
   if (req.body.title === undefined) {
     res.status(400);
     res.setHeader('content-type', 'text/plain');
@@ -71,7 +70,7 @@ router.post('/books', (req, res, next) => {
 })
 
 router.patch('/books/:id', (req, res, next) => {
-  if (parseInt(req.params.id)*0 !== 0) {
+  if (parseInt(req.params.id) * 0 !== 0) {
     return res.sendStatus(404)
   }
   knex('books')
@@ -87,12 +86,10 @@ router.patch('/books/:id', (req, res, next) => {
         .update(req.body)
       res.send(req.body)
     })
-
-
 })
 
 router.delete('/books/:id', (req, res, next) => {
-  if (parseInt(req.params.id)*0 !== 0) {
+  if (parseInt(req.params.id) * 0 !== 0) {
     return res.sendStatus(404)
   }
   knex('books')
