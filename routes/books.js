@@ -21,7 +21,7 @@ router.get('/books', (req, res, next) => {
 })
 
 router.get('/books/:id', (req, res, next) => {
-  if (parseInt(req.params.id) !== typeof(1)) {
+  if (parseInt(req.params.id)*0 !== 0) {
     return res.sendStatus(404)
   }
   knex('books')
@@ -34,8 +34,7 @@ router.get('/books/:id', (req, res, next) => {
       knex('books')
         .select('id', 'genre', 'title', 'author', 'description', 'cover_url as coverUrl', 'created_at as createdAt', 'updated_at as updatedAt').where('id', '=', req.params.id)
         .then((result) => {
-
-          res.send(result);
+          res.send(result[0]);
         })
     })
 })
@@ -72,7 +71,7 @@ router.post('/books', (req, res, next) => {
 })
 
 router.patch('/books/:id', (req, res, next) => {
-  if (parseInt(req.params.id) !== typeof(1)) {
+  if (parseInt(req.params.id)*0 !== 0) {
     return res.sendStatus(404)
   }
   knex('books')
@@ -93,7 +92,7 @@ router.patch('/books/:id', (req, res, next) => {
 })
 
 router.delete('/books/:id', (req, res, next) => {
-  if (parseInt(req.params.id) !== typeof(1)) {
+  if (parseInt(req.params.id)*0 !== 0) {
     return res.sendStatus(404)
   }
   knex('books')
