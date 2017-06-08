@@ -22,14 +22,14 @@ router.get('/books', (req, res, next) => {
 
 router.get('/books/:id', (req, res, next) => {
   if (parseInt(req.params.id) * 0 !== 0) {
-    return res.sendStatus(404)
+    return res.sendStatus(404);
   }
   knex('books')
     .select('id')
     .where('id', '=', req.params.id)
     .then(total => {
       if (total.length === 0) {
-        return res.sendStatus(404)
+        return res.sendStatus(404);
       }
       knex('books')
         .select('id', 'genre', 'title', 'author', 'description', 'cover_url as coverUrl', 'created_at as createdAt', 'updated_at as updatedAt').where('id', '=', req.params.id)
@@ -41,9 +41,9 @@ router.get('/books/:id', (req, res, next) => {
 
 router.post('/books', (req, res, next) => {
   if (!req.body) {
-    res.status(400)
+    res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Body must not be blank')
+    return res.send('Body must not be blank');
   } else if (req.body.title === undefined) {
     res.status(400);
     res.setHeader('content-type', 'text/plain');
@@ -69,49 +69,49 @@ router.post('/books', (req, res, next) => {
     .returning('*')
     .insert(humps.decamelizeKeys(req.body))
     .then(result => {
-      res.send(humps.camelizeKeys(result[0]))
+      res.send(humps.camelizeKeys(result[0]));
     })
 })
 
 router.patch('/books/:id', (req, res, next) => {
   if (parseInt(req.params.id) * 0 !== 0) {
-    return res.sendStatus(404)
+    return res.sendStatus(404);
   }
   knex('books')
     .select('id')
     .where('id', '=', req.params.id)
     .then(total => {
       if (total.length === 0) {
-        return res.sendStatus(404)
+        return res.sendStatus(404);
       }
-      req.body['id'] = req.params.id
+      req.body['id'] = req.params.id;
       knex('books')
         .where('id', '=', req.params.id)
         .update(req.body)
-      res.send(req.body)
+      res.send(req.body);
     })
 })
 
 router.delete('/books/:id', (req, res, next) => {
   if (parseInt(req.params.id) * 0 !== 0) {
-    return res.sendStatus(404)
+    return res.sendStatus(404);
   }
   knex('books')
     .select('id')
     .where('id', '=', req.params.id)
     .then(total => {
       if (total.length === 0) {
-        return res.sendStatus(404)
+        return res.sendStatus(404);
       }
       knex('books')
         .returning('*')
         .where('id', '=', req.params.id)
         .del()
         .then(result => {
-          delete result[0].id
-          delete result[0].created_at
-          delete result[0].updated_at
-          res.send(humps.camelizeKeys(result[0]))
+          delete result[0].id;
+          delete result[0].created_at;
+          delete result[0].updated_at;
+          res.send(humps.camelizeKeys(result[0]));
         })
     })
 })

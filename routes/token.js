@@ -11,27 +11,27 @@ const knex = require('../knex');
 // YOUR CODE HERE
 
 router.get('/token', (req, res, next) => {
-  var token = req.cookies.token
+  var token = req.cookies.token;
   jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
     if (err) {
-      return res.send(false)
+      return res.send(false);
     }
-    res.send(true)
+    res.send(true);
   });
 })
 
 router.post('/token', (req, res, next) => {
   if (!req.body) {
-    res.send(false)
+    res.send(false);
   }
   if (req.body.email===undefined){
     res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Email must not be blank')
+    return res.send('Email must not be blank');
   }else if (req.body.password===undefined){
     res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Password must not be blank')
+    return res.send('Password must not be blank');
   }
     knex('users')
       .select('id', 'email', 'first_name as firstName', 'last_name as lastName', 'hashed_password as hash')
@@ -39,9 +39,9 @@ router.post('/token', (req, res, next) => {
       .first()
       .then(userInfo => {
         if (userInfo === undefined) {
-          res.status(400)
-          res.setHeader('Content-Type', 'text/plain')
-          return res.send("Bad email or password")
+          res.status(400);
+          res.setHeader('Content-Type', 'text/plain');
+          return res.send("Bad email or password");
         }
         bcrypt.compare(req.body.password, userInfo.hash, (err, response) => {
           if (response) {
@@ -50,19 +50,19 @@ router.post('/token', (req, res, next) => {
             res.cookie('token', token, {
               httpOnly: true
             });
-            return res.send(userInfo)
+            return res.send(userInfo);
           }
-          res.status(400)
-          res.setHeader('Content-Type', 'text/plain')
-          res.send('Bad email or password')
+          res.status(400);
+          res.setHeader('Content-Type', 'text/plain');
+          res.send('Bad email or password');
         })
       })
 
 })
 
 router.delete('/token', (req, res, next) => {
-  res.cookie('token', '')
-  res.send(true)
+  res.cookie('token', '');
+  res.send(true);
 })
 
 module.exports = router;

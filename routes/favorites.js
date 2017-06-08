@@ -13,37 +13,37 @@ const humps = require('humps');
 
 router.use('/favorites', (req, res, next) => {
   if (req.cookies.token) {
-    let token = req.cookies.token
+    let token = req.cookies.token;
     jwt.verify(token, process.env.JWT_KEY, (err, decode) => {
       if (err) {
         res.clearCookie('token');
-        return next(err)
+        return next(err);
       }
       req.user = decode
-      next()
+      next();
     })
   } else {
-    res.sendStatus(401)
+    res.sendStatus(401);
   }
 })
 
 router.get('/favorites', (req, res, next) => {
   if (!req.user) {
-    return res.sendStatus(401)
+    return res.sendStatus(401);
   }
   knex('favorites')
     .select('favorites.id', 'genre', 'title', 'books.created_at as createdAt', 'user_id as userId', 'author', 'book_id as bookId', 'cover_url as coverUrl', 'description', 'books.updated_at as updatedAt')
     .join('books', 'favorites.book_id', 'books.id')
     .then(result => {
-      res.send(humps.camelizeKeys(result))
+      res.send(humps.camelizeKeys(result));
     })
 });
 
 router.get('/favorites/check', (req, res, next) => {
   if (parseInt(req.query.bookId) * 0 !== 0) {
-    res.status(400)
+    res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Book ID must be an integer')
+    return res.send('Book ID must be an integer');
   }
   knex('favorites')
     .select('favorites.id', 'genre', 'title', 'books.created_at as createdAt', 'user_id as userId', 'author', 'book_id as bookId', 'cover_url as coverUrl', 'description', 'books.updated_at as updatedAt')
@@ -51,34 +51,34 @@ router.get('/favorites/check', (req, res, next) => {
     .where('book_id', req.query.bookId)
     .then(result => {
       if (result[0] === undefined) {
-        return res.send(false)
+        return res.send(false);
       }
-      res.send(true)
+      res.send(true);
     })
 });
 
 router.post('/favorites', (req, res, next) => {
   if (!req.body) {
-    res.status(400)
+    res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Body must not be blank')
+    return res.send('Body must not be blank');
   } else if (parseInt(req.body.bookId) * 0 !== 0) {
-    res.status(400)
+    res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Book ID must be an integer')
+    return res.send('Book ID must be an integer');
   }
   knex('books')
     .select('id')
     .where('id', '=', req.body.bookId)
     .then(total => {
       if (total.length === 0) {
-        res.status(404)
-        res.setHeader('content-type', 'text/plain')
-        return res.send('Book not found')
+        res.status(404);
+        res.setHeader('content-type', 'text/plain');
+        return res.send('Book not found');
       }
       req.body.book_id = req.body.bookId;
-      req.body.user_id = req.user.id
-      delete req.body.bookId
+      req.body.user_id = req.user.id;
+      delete req.body.bookId;
       knex('favorites')
         .select('book_id')
         .where('book_id','=',req.body.book_id)
@@ -86,18 +86,18 @@ router.post('/favorites', (req, res, next) => {
           if (book_id.length>0){
             res.status(400);
             res.setHeader('content-type','text/plain');
-            res.send('Book already in favorites')
+            res.send('Book already in favorites');
           }
           knex('favorites')
             .returning('*')
             .insert(req.body)
             .then(result => {
               if (result[0] === undefined) {
-                return res.sendStatus(401)
+                return res.sendStatus(401);
               }
               delete result[0].created_at;
               delete result[0].updated_at;
-              res.send(humps.camelizeKeys(result[0]))
+              res.send(humps.camelizeKeys(result[0]));
             })
         })
 
@@ -106,30 +106,30 @@ router.post('/favorites', (req, res, next) => {
 
 router.delete('/favorites', (req, res, next) => {
   if (!req.body) {
-    res.status(400)
+    res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Body must not be blank')
+    return res.send('Body must not be blank');
   } else if (parseInt(req.body.bookId) * 0 !== 0) {
-    res.status(400)
+    res.status(400);
     res.setHeader('content-type', 'text/plain');
-    return res.send('Book ID must be an integer')
+    return res.send('Book ID must be an integer');
   }
   knex('books')
     .select('id')
     .where('id', '=', req.body.bookId)
     .then(total => {
       if (total.length === 0) {
-        res.status(404)
-        res.setHeader('content-type', 'text/plain')
-        return res.send('Favorite not found')
+        res.status(404);
+        res.setHeader('content-type', 'text/plain');
+        return res.send('Favorite not found');
       }
       knex('favorites')
         .where('user_id', req.user.id)
         .returning('*')
         .del()
         .then(result => {
-          delete result[0].id
-          res.send(humps.camelizeKeys(result[0]))
+          delete result[0].id;
+          res.send(humps.camelizeKeys(result[0]));
         })
     })
 });
