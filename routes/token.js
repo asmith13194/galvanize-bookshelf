@@ -24,9 +24,18 @@ router.post('/token', (req, res, next) => {
   if (!req.body) {
     res.send(false)
   }
+  if (req.body.email===undefined){
+    res.status(400);
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Email must not be blank')
+  }else if (req.body.password===undefined){
+    res.status(400);
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Password must not be blank')
+  }
     knex('users')
       .select('id', 'email', 'first_name as firstName', 'last_name as lastName', 'hashed_password as hash')
-      .where('email', req.body.email)
+      .where('email','=', req.body.email)
       .first()
       .then(userInfo => {
         if (userInfo === undefined) {

@@ -40,7 +40,11 @@ router.get('/books/:id', (req, res, next) => {
 })
 
 router.post('/books', (req, res, next) => {
-  if (req.body.title === undefined) {
+  if (!req.body) {
+    res.status(400)
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Body must not be blank')
+  } else if (req.body.title === undefined) {
     res.status(400);
     res.setHeader('content-type', 'text/plain');
     return res.send('Title must not be blank');
