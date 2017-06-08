@@ -80,16 +80,27 @@ router.post('/favorites', (req, res, next) => {
       req.body.user_id = req.user.id
       delete req.body.bookId
       knex('favorites')
-        .returning('*')
-        .insert(req.body)
-        .then(result => {
-          if (result[0] === undefined) {
-            return res.sendStatus(401)
+        .select('book_id')
+        .where('book_id','=',req.body.book_id)
+        .then(book_id=>{
+          if (book_id.length>0){
+            res.status(400);
+            res.setHeader('content-type','text/plain');
+            res.send('Book already in favorites')
           }
-          delete result[0].created_at;
-          delete result[0].updated_at;
-          res.send(humps.camelizeKeys(result[0]))
+          knex('favorites')
+            .returning('*')
+            .insert(req.body)
+            .then(result => {
+              if (result[0] === undefined) {
+                return res.sendStatus(401)
+              }
+              delete result[0].created_at;
+              delete result[0].updated_at;
+              res.send(humps.camelizeKeys(result[0]))
+            })
         })
+
     })
 });
 
