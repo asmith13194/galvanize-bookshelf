@@ -40,6 +40,11 @@ router.get('/favorites', (req, res, next) => {
 });
 
 router.get('/favorites/check', (req, res, next) => {
+  if (parseInt(req.query.bookId) * 0 !== 0) {
+    res.status(400)
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Book ID must be an integer')
+  }
   knex('favorites')
     .select('favorites.id', 'genre', 'title', 'books.created_at as createdAt', 'user_id as userId', 'author', 'book_id as bookId', 'cover_url as coverUrl', 'description', 'books.updated_at as updatedAt')
     .join('books', 'favorites.book_id', 'books.id')
@@ -57,31 +62,64 @@ router.post('/favorites', (req, res, next) => {
     res.status(400)
     res.setHeader('content-type', 'text/plain');
     return res.send('Body must not be blank')
+  } else if (parseInt(req.body.bookId) * 0 !== 0) {
+    res.status(400)
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Book ID must be an integer')
   }
-  req.body.book_id = req.body.bookId;
-  req.body.user_id = req.user.id
-  delete req.body.bookId
-  knex('favorites')
-    .returning('*')
-    .insert(req.body)
-    .then(result => {
-      if (result[0] === undefined) {
-        return res.sendStatus(401)
+  knex('books')
+    .select('id')
+    .where('id', '=', req.body.bookId)
+    .then(total => {
+      if (total.length === 0) {
+        res.status(404)
+        res.setHeader('content-type', 'text/plain')
+        return res.send('Book not found')
       }
-      delete result[0].created_at;
-      delete result[0].updated_at;
-      res.send(humps.camelizeKeys(result[0]))
+      req.body.book_id = req.body.bookId;
+      req.body.user_id = req.user.id
+      delete req.body.bookId
+      knex('favorites')
+        .returning('*')
+        .insert(req.body)
+        .then(result => {
+          if (result[0] === undefined) {
+            return res.sendStatus(401)
+          }
+          delete result[0].created_at;
+          delete result[0].updated_at;
+          res.send(humps.camelizeKeys(result[0]))
+        })
     })
 });
 
 router.delete('/favorites', (req, res, next) => {
-  knex('favorites')
-    .where('user_id', req.user.id)
-    .returning('*')
-    .del()
-    .then(result => {
-      delete result[0].id
-      res.send(humps.camelizeKeys(result[0]))
+  if (!req.body) {
+    res.status(400)
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Body must not be blank')
+  } else if (parseInt(req.body.bookId) * 0 !== 0) {
+    res.status(400)
+    res.setHeader('content-type', 'text/plain');
+    return res.send('Book ID must be an integer')
+  }
+  knex('books')
+    .select('id')
+    .where('id', '=', req.body.bookId)
+    .then(total => {
+      if (total.length === 0) {
+        res.status(404)
+        res.setHeader('content-type', 'text/plain')
+        return res.send('Favorite not found')
+      }
+      knex('favorites')
+        .where('user_id', req.user.id)
+        .returning('*')
+        .del()
+        .then(result => {
+          delete result[0].id
+          res.send(humps.camelizeKeys(result[0]))
+        })
     })
 });
 
